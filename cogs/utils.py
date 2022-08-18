@@ -13,7 +13,7 @@ class Utils(commands.Cog):
         start = time()
         response = await ctx.reply("pong!")
         delta = time() - start
-        await response.edit(f"pong! (took {delta:.4f}s)")
+        await response.edit(content=f"pong! (took {delta:.4f}s)")
 
 
 async def setup(bot):

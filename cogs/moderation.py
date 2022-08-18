@@ -44,7 +44,7 @@ class ReportView(discord.ui.View):
         super().__init__(timeout=None)
 
     @discord.ui.button(label='Submit report', style=discord.ButtonStyle.green, custom_id='report_view:submit')
-    async def green(self, button: discord.ui.Button, interaction: discord.Interaction) -> None:
+    async def green(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
         await interaction.response.send_modal(ReportModal())
 
 

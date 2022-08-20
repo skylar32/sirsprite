@@ -11,6 +11,8 @@ guilds = {
         },
         'staff': 00000000000000000, # the ID of the mod chat
         'report_post_id': 00000000000000000, # the ID of the persistent report review message, once sent
+        'setup_mode': True, # setting this to true enables certain setup commands for the guild. set it to false
+                            # or remove it once setup is complete in order to hide the commands and prevent clutter.
     },
     000000000000000001: {
         # and so on...

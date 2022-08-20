@@ -20,6 +20,7 @@ class Sirsprite(commands.Bot):
         super().__init__(
             command_prefix=commands.when_mentioned_or('🧅-'),
             description="A bot for the Thousand Roads Discord community.  Ohoho!",
+            help_command=None,
             intents=intents
         )
 

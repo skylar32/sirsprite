@@ -7,16 +7,20 @@ import config
 
 
 class StorycrafterEmbed(discord.Embed):
-    def __init__(self, description, interaction):
-        super().__init__(
-            title="New Storycrafter prompt!",
-            description=description,
-            color=discord.Color.lighter_gray()
+    def __init__(self, interaction: discord.Interaction, is_prompt: bool):
+        super().__init__(color=discord.Color.lighter_gray()
         )
-        self.set_author(
-            name=interaction.user.display_name,
-            icon_url=interaction.user.display_avatar.url
-        )
+        if is_prompt:
+            self.set_author(
+                name=f"Prompt from {interaction.user.display_name}",
+                icon_url=interaction.user.display_avatar.url
+            )
+        if 'rules_link' in config.guilds[interaction.guild_id]['storycrafter']:
+            self.add_field(
+                name="What is this?" if is_prompt else "More info",
+                value=f"[Click here]({config.guilds[interaction.guild_id]['storycrafter']['rules_link']})"
+            )
+
         if 'role_link' in config.guilds[interaction.guild_id]['storycrafter']:
             self.add_field(
                 name="Want notifications?",
@@ -36,25 +40,27 @@ class StorycrafterPromptModal(discord.ui.Modal, title='Submit a Storycrafter pro
             storycrafter_thread = interaction.guild.get_channel_or_thread(
                     config.guilds[interaction.guild_id]['storycrafter']['thread_id']
             )
+
             alert_channel = storycrafter_thread.parent
+            ping = '\n🔔' + interaction.guild.get_role(
+                config.guilds[interaction.guild_id]['storycrafter']['role_id']
+            ).mention
+
             prompt = await storycrafter_thread.send(
-                '🔔' + interaction.guild.get_role(
-                    config.guilds[interaction.guild_id]['storycrafter']['role_id']
-                ).mention,
-                embed=StorycrafterEmbed(self.prompt.value, interaction)
+                f"**New Storycrafter prompt!**\n\n> {self.prompt.value}\n {ping}",
+                embed=StorycrafterEmbed(interaction, is_prompt=True)
             )
-            success_embed = discord.Embed(
-                title=f"New Storycrafter prompt posted!",
-                description=f"Join the discussion in {storycrafter_thread.mention}!\n"
-                            f"[Jump to prompt]({prompt.jump_url})",
-                color=discord.Color.lighter_gray()
-            )
+
+            success_embed = StorycrafterEmbed(interaction, is_prompt=False)
+            success_embed.description = f"[Jump to prompt]({prompt.jump_url})"
+
             if interaction.channel == alert_channel:
                 await interaction.response.send_message(
+                    f"**New {storycrafter_thread.mention} prompt posted!**",
                     embed=success_embed
                 )
             else:
-                await alert_channel.send(embed=success_embed)
+                await alert_channel.send(f"**New {storycrafter_thread.mention} prompt posted!**", embed=success_embed)
                 await interaction.response.send_message(
                     f"Prompt posted to {storycrafter_thread.mention}.",
                     ephemeral=True
@@ -85,12 +91,7 @@ class Storycrafter(commands.Cog):
             f"`/storycrafter` command and shared in the {storycrafter_thread.mention} thread."
         )
 
-        embed = discord.Embed(color=discord.Color.lighter_gray())
-        if rules_link := storycrafter_guild_config.get("rules_link"):
-            embed.add_field(name="Want more info?", value=f"[Click here]({rules_link})")
-        if role_link := storycrafter_guild_config.get("role_link"):
-            embed.add_field(name="Get notifications", value=f"[Click here]({role_link})")
-
+        embed = StorycrafterEmbed(interaction, is_prompt=False)
         if embed.fields:
             await interaction.response.send_message(message_content, embed=embed, ephemeral=ephemeral)
         else:

@@ -7,6 +7,8 @@ from discord import app_commands
 import config
 
 
+SETUP_GUILDS = [guild for guild in config.guilds if config.guilds[guild].get("setup_mode", False)]
+
 class ReportModal(discord.ui.Modal, title='Submit a report to the community staff'):
     report = discord.ui.TextInput(
         label='Enter your report here',
@@ -97,9 +99,10 @@ class ContextMenuReport(discord.ui.Modal):
 class Moderation(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.setup_guilds = [guild for guild in config.guilds if config.guilds[guild].get("setup_mode", False)]
 
     @app_commands.command()
-    @app_commands.guilds(*config.guilds.keys())
+    @app_commands.guilds(*SETUP_GUILDS)
     async def prepare_report_view(self, interaction: discord.Interaction, channel: discord.TextChannel):
         """Create the report submission master post."""
         if not await self.bot.is_owner(interaction.user):

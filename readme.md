@@ -8,10 +8,9 @@ A simple bot that performs utility functions for the Thousand Roads community.
    ```bash
    python3.10 -m venv env
    source env/bin/activate
-3. Install dependencies.  At present the only dependency is the development version of
-   [discord.py](https://github.com/Rapptz/discord.py).  It must be installed from Git.
+3. Install dependencies:
    ```bash
-    pip install git+https://github.com/Rapptz/discord.py.git
+    pip install -r requirements.txt
 4. Set up your configuration.  A handful of thread, channel, and message IDs must be supplied
    in `config.py` for all of the bot's extensions to function properly.  An example configuration
    is provided in [config.example.py](config.example.py), though obviously you will need to fill in

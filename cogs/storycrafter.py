@@ -69,8 +69,14 @@ class StorycrafterPromptModal(discord.ui.Modal, title='Submit a Storycrafter pro
 
 class Storycrafter(commands.Cog):
     """Commands for sharing story-related prompts."""
-    def __init__(self, bot):
+    def __init__(self, bot: discord.ext.commands.Bot):
         self.bot = bot
+
+    async def send_help_message(self, interaction: discord.Interaction, ephemeral: bool = True):
+        if "storycrafter" not in config.guilds[interaction.guild.id]:
+            await interaction.response.send_message("Storycrafter is not configured for this server.")
+        else:
+            await interaction.response.send_message("Test help message.")
 
     @app_commands.command()
     @app_commands.guilds(*config.guilds.keys())

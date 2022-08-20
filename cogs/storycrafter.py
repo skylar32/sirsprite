@@ -47,7 +47,7 @@ class StorycrafterPromptModal(discord.ui.Modal, title='Submit a Storycrafter pro
             ).mention
 
             prompt = await storycrafter_thread.send(
-                f"**New Storycrafter prompt!**\n\n> {self.prompt.value}\n {ping}",
+                f"**New Storycrafter prompt!**\n\n> {self.prompt.value}\n\n{ping}",
                 embed=StorycrafterEmbed(interaction, is_prompt=True)
             )
 

@@ -75,8 +75,26 @@ class Storycrafter(commands.Cog):
     async def send_help_message(self, interaction: discord.Interaction, ephemeral: bool = True):
         if "storycrafter" not in config.guilds[interaction.guild.id]:
             await interaction.response.send_message("Storycrafter is not configured for this server.")
+
+        storycrafter_guild_config = config.guilds[interaction.guild.id]['storycrafter']
+        storycrafter_thread = self.bot.get_channel(storycrafter_guild_config ['thread_id'])
+        message_content = (
+            "💬 **What is Storycrafter?** ✍️\n"
+            "Storycrafter is a community thread for sharing and answering fun questions that will get "
+            "writers thinking about their stories in new ways. Questions are posted through this bot's "
+            f"`/storycrafter` command and shared in the {storycrafter_thread.mention} thread."
+        )
+
+        embed = discord.Embed(color=discord.Color.lighter_gray())
+        if rules_link := storycrafter_guild_config.get("rules_link"):
+            embed.add_field(name="Want more info?", value=f"[Click here]({rules_link})")
+        if role_link := storycrafter_guild_config.get("role_link"):
+            embed.add_field(name="Get notifications", value=f"[Click here]({role_link})")
+
+        if embed.fields:
+            await interaction.response.send_message(message_content, embed=embed, ephemeral=ephemeral)
         else:
-            await interaction.response.send_message("Test help message.")
+            await interaction.response.send_message(message_content, ephemeral=ephemeral)
 
     @app_commands.command()
     @app_commands.guilds(*config.guilds.keys())

@@ -42,7 +42,7 @@ class StorycrafterPromptModal(discord.ui.Modal, title='Submit a Storycrafter pro
             )
 
             alert_channel = storycrafter_thread.parent
-            ping = '\n🔔' + interaction.guild.get_role(
+            ping = '🔔' + interaction.guild.get_role(
                 config.guilds[interaction.guild_id]['storycrafter']['role_id']
             ).mention
 

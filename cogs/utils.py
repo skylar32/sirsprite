@@ -19,15 +19,14 @@ class Utils(commands.Cog):
         await response.edit(f"pong! (took {delta:.4f}s)")
 
     @app_commands.command(description="Get help with a bot command.")
-    @app_commands.rename(ephemeral="visible")
-    @app_commands.describe(command="the command to get help with", ephemeral="whether the response should be public")
+    @app_commands.describe(command="the command to get help with", visible="whether the response should be public")
     @app_commands.guilds(*config.guilds.keys())
-    async def help(self, interaction: discord.Interaction, command: str, ephemeral: bool = False):
+    async def help(self, interaction: discord.Interaction, command: str, visible: bool = False):
         if (command := self.bot.tree.get_command(command.lower(), guild=interaction.guild)) is None:
             await interaction.response.send_message(f"Invalid command.", ephemeral=True)
 
         try:
-            await command.binding.send_help_message(interaction, ephemeral=ephemeral)
+            await command.binding.send_help_message(interaction, ephemeral=not visible)
         except AttributeError:
             await interaction.response.send_message(
                 "Help has not been configured for this command. If you would like a "

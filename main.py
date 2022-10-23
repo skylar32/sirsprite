@@ -8,18 +8,17 @@ import config
 
 extensions = (
     'cogs.utils',
-    'cogs.moderation',
-    'cogs.storycrafter',
+    'cogs.moderation'
 )
 
 
-class Sirsprite(commands.Bot):
+class ConnectionOrb(commands.Bot):
     def __init__(self):
         intents = discord.Intents.default()
         intents.message_content = True
         super().__init__(
             command_prefix=commands.when_mentioned_or('🧅-'),
-            description="A bot for the Thousand Roads Discord community.  Ohoho!",
+            description="A bot for PMD: Writers United. Be not afraid.",
             help_command=None,
             intents=intents
         )
@@ -44,5 +43,5 @@ class Sirsprite(commands.Bot):
 
 
 if __name__ == "__main__":
-    bot = Sirsprite()
+    bot = ConnectionOrb()
     bot.run()

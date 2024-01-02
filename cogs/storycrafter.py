@@ -12,7 +12,7 @@ class StorycrafterEmbed(discord.Embed):
         )
         if is_prompt:
             self.set_author(
-                name=f"Prompt from {interaction.user.display_name}",
+                name=f"Storycrafter prompt from {interaction.user.display_name}",
                 icon_url=interaction.user.display_avatar.url
             )
         if 'rules_link' in config.guilds[interaction.guild_id]['storycrafter']:
@@ -37,40 +37,28 @@ class StorycrafterPromptModal(discord.ui.Modal, title='Submit a Storycrafter pro
 
     async def on_submit(self, interaction: discord.Interaction):
         if 'storycrafter' in config.guilds[interaction.guild_id]:
-            storycrafter_thread = interaction.guild.get_channel_or_thread(
-                    config.guilds[interaction.guild_id]['storycrafter']['thread_id']
+            storycrafter_channel = interaction.guild.get_channel(
+                    config.guilds[interaction.guild_id]['storycrafter']['channel_id']
             )
-
-            alert_channel = storycrafter_thread.parent
             ping = '🔔' + interaction.guild.get_role(
                 config.guilds[interaction.guild_id]['storycrafter']['role_id']
             ).mention
 
-            prompt = await storycrafter_thread.send(
-                f"**New Storycrafter prompt!**\n\n> {self.prompt.value}\n\n{ping}",
-                embed=StorycrafterEmbed(interaction, is_prompt=True)
-            )
+            quoted_prompt = "\n".join((f"> {line}" for line in self.prompt.value.splitlines()))
 
-            success_embed = StorycrafterEmbed(interaction, is_prompt=False)
-            success_embed.description = f"[Jump to prompt]({prompt.jump_url})"
-
-            if interaction.channel == alert_channel:
+            if interaction.channel == storycrafter_channel:
                 await interaction.response.send_message(
-                    f"**New {storycrafter_thread.mention} prompt posted!**",
-                    embed=success_embed
+                    f"{quoted_prompt}\n{ping}",
+                    embed=StorycrafterEmbed(interaction, is_prompt=True)
                 )
             else:
-                await alert_channel.send(f"**New {storycrafter_thread.mention} prompt posted!**", embed=success_embed)
-                await interaction.response.send_message(
-                    f"Prompt posted to {storycrafter_thread.mention}.",
-                    ephemeral=True
+                await storycrafter_channel.send(
+                    f"{quoted_prompt}\n{ping}",
+                    embed=StorycrafterEmbed(interaction, is_prompt=True)
                 )
-
-        else:
-            await interaction.response.send_message(
-                "Storycrafter is not currently supported in this server.",
-                ephemeral=True
-            )
+                await interaction.response.send_message(
+                    f"Prompt posted to {storycrafter_channel.mention}!", ephemeral=True
+                )
 
 
 class Storycrafter(commands.Cog):
@@ -105,15 +93,4 @@ class Storycrafter(commands.Cog):
 
 
 async def setup(bot):
-    for guild_id in config.guilds:
-        guild = config.guilds[guild_id]
-        if 'storycrafter' in guild:
-            storycrafter_thread = bot.get_channel(guild['storycrafter']['thread_id'])
-            try:
-                await storycrafter_thread.join()
-            except AttributeError:
-                print(
-                    f"Storycrafter thread in {guild['name']} is archived and was not joined.",
-                    file=sys.stderr
-                )
     await bot.add_cog(Storycrafter(bot))
